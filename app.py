@@ -33,6 +33,18 @@ class vida(db.Model):
     def __repr__(self):
         return '<vida %r>' % (self.name)
 
+def resultadoQuery (Estado,Sectores,Parametro):
+    results = db.session.query(vida.Edad, Parametro).filter(vida.Entidad == Estado,vida.Sector == Sectores)
+
+    # Create a dictionary from the row data and append to a list
+    lista_resultado = []
+    for Edad, Dato in results:
+        lista_dict = {}
+        lista_dict["Edad"] = Edad
+        lista_dict[Sectores] = Dato
+        lista_resultado.append(lista_dict)
+
+    return lista_resultado
 
 # Create database tables
 @app.before_first_request
@@ -48,22 +60,30 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/Aguascalientes/Sobrevivientes")
-def sobrevivientes():
+@app.route("/Aguascalientes/Sobrevivientes/Total")
+def AgsSobrevivientesTotal():
     """Return a list of passenger data including the name, age, and sex of each passenger"""
     # Query all passengers
-    results = db.session.query(vida.Edad, vida.Sobrevivientes).all()
+    return jsonify(resultadoQuery("Aguascalientes","Total","vida.Sobrevivientes"))
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-    all_sobrevivientes = []
-    for Edad, Sobrevivientes in results:
-        passenger_dict = {}
-        passenger_dict["Edad"] = Edad
-        passenger_dict["Sobrevivientes"] = Sobrevivientes
-        all_sobrevivientes.append(passenger_dict)
+@app.route("/Aguascalientes/Sobrevivientes/Comercio")
+def AgsSobrevivientesComercio():
+    """Return a list of passenger data including the name, age, and sex of each passenger"""
+    # Query all passengers
+    return jsonify(resultadoQuery("Aguascalientes","Comercio","vida.Sobrevivientes"))
 
-    return jsonify(all_sobrevivientes)
 
+@app.route("/Aguascalientes/Probabilidad_Supervivencia/Total")
+def AgsProbabilidadSupervivenciaTotal():
+    """Return a list of passenger data including the name, age, and sex of each passenger"""
+    # Query all passengers
+    return jsonify(resultadoQuery("Aguascalientes","Total","vida.Probabilidad_Supervivencia"))
+
+@app.route("/BajaCalifornia/Sobrevivientes/Comercio")
+def BajSobrevivientesComercio():
+    """Return a list of passenger data including the name, age, and sex of each passenger"""
+    # Query all passengers
+    return jsonify(resultadoQuery("BajaCalifornia","Comercio","vida.Sobrevivientes"))
 
 
 if __name__ == '__main__':
